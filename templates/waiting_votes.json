@@ -1,0 +1,52 @@
+{
+    "players": [
+        {
+            "name": "User",
+            "card": "#"
+        },
+        {
+            "name": "Usuario corno",
+            "card": "#"
+        },
+        {
+            "name": "Usuario burro",
+            "card": "#"
+        }
+    ],
+    "deck": [
+        {
+            "label": "1"
+        },
+        {
+            "label": "2"
+        },
+        {
+            "label": "3"
+        },
+        {
+            "label": "5"
+        },
+        {
+            "label": "8"
+        },
+        {
+            "label": "13"
+        },
+        {
+            "label": "20"
+        },
+        {
+            "label": "40"
+        },
+        {
+            "label": "80"
+        },
+        {
+            "label": "?"
+        }
+    ],
+    "task": {
+        "label": "Teste task"
+    },
+    "tasks": []
+}

@@ -1,0 +1,42 @@
+services:
+  base:
+    build: .
+    image: pokerplanning
+
+  build:
+    extends:
+      service: base
+    volumes:
+      - .:/app
+    working_dir: /app
+    command:  make i386
+
+  clean:
+    extends:
+      service: base
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: make clean
+
+  run:
+    extends:
+      service: base
+    volumes:
+      - .:/app
+    ports:
+      - "18080:18080"
+    working_dir: /app
+    command: ./Bin/pokerplanning
+  
+  debug:
+    extends:
+      service: base
+    volumes:
+      - .:/app
+    ports:
+      - "18080:18080"
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    command: /bin/bash

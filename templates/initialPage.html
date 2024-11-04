@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokkerPlanning</title>
+    <style>
+        body {
+            font-family: "Lato", -apple-system, Helvetica, Arial, sans-serif;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #f7f7f7;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 50px auto;
+            width: 400px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            margin-bottom: 10px;
+            
+        }
+
+        input {
+            width: 100%;
+
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button[type="submit"] {
+            background-color: #4CAF50;
+            /* green */
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form id="form-entrada" method="POST" enctype="application/json">
+            <h2>Nova Sala</h2>
+            <label for="nome-sala">Nome da Sala:</label>
+            <input type="text" id="nome-sala" name="room_label" required placeholder="Ex.: Sprint 109">
+            <label for="nome-usuario">Nome de Usuário:</label>
+            <input type="text" id="nome-usuario" name="user_label" required placeholder="Ex.: Cafézin">
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+</body>
+
+</html>

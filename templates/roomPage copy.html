@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planning Poker</title>
+  <style>
+    body {
+      font-family: "Lato", -apple-system, Helvetica, Arial, sans-serif;
+      text-align: center;
+    }
+
+    .card {
+      width: 49px;
+      height: 70px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin: 10px;
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .card .value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .card .description {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .player {
+      display: inline-block;
+      vertical-align: top;
+      margin: 20px;
+
+    }
+
+    .player .name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .player .card {
+      margin: 0;
+      background-color: aliceblue;
+    }
+
+    .players {
+      border: black 1px solid;
+      border-radius: 20px;
+      padding: 10px;
+      background-color: #9cb899;
+      width: fit-content;
+      margin: auto;
+      min-width: 350px;
+
+    }
+
+    .deck {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: aliceblue;
+    }
+
+    .task {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    .buttons {
+      margin-left: 20px;
+      margin-bottom: 10px;
+    }
+
+    .task-title {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .reveal-button,
+    .new-button {
+      background-color: #4CAF50;
+      /* green */
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+
+    .cancel-button {
+      background-color: #ccc;
+      /* gray */
+      color: #333;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+      border-radius: 10px;
+    }
+
+
+    .poker-planning-table {
+      flex: 80%;
+    }
+
+    .main-title {
+
+      margin-bottom: 0px;
+    }
+
+    .poker-planning-table,
+    .vote-list {
+
+      background-color: #f7f7f7;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    .results-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .result {
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+
+    .card-value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .card-description {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .votes-count {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .median-result {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .scroll {
+      height: 100vh;
+      padding-bottom: 95px;
+    }
+
+    .median-result h3 {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .median-result p {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .maincontent {
+      display: flex;
+      /* make the container a grid container */
+    }
+
+    .list-item {
+      margin-bottom: 20px;
+    }
+
+    .list-item h4 {
+      margin: 0;
+    }
+
+    .list-item p {
+      margin: 0;
+    }
+
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1 class="main-title">{{ table_label }}</h1>
+    {{# isAdmin }}
+    <p> {{ table_link }}</p>
+    {{/ isAdmin }}
+
+  </header>
+  <div class="scroll">
+
+    <div class="task">
+      <h2 class="task-title"></h2>
+      {{# isAdmin }}
+      <div class="buttons">
+        <button class="reveal-button">Revelar</button>
+        <button class="cancel-button">Cancelar</button>
+      </div>
+      {{/ isAdmin }}
+      <div class="buttons" style="display: none;">
+        <button class="reveal-button">Novo</button>
+      </div>
+    </div>
+    <div class="maincontent">
+
+      <div class="poker-planning-table">
+        <div class="players">
+          <!--Players-->
+        </div>
+
+        <div class="results">
+          <h2>Resultado</h2>
+          <div class="results-container">
+
+          </div>
+          <div class="median-result">
+            <h3>Média: -</h3>
+
+          </div>
+        </div>
+      </div>
+      <div class="vote-list">
+        <h2>Tarefas votadas</h2>
+        <ul id="vote-list" class="list">
+          <!-- Add more tasks here -->
+        </ul>
+      </div>
+
+    </div>
+
+    <footer class="deck">
+
+      <div class="cards">
+
+      </div>
+
+    </footer>
+    <script>
+      const jsonData = [
+        { cardValue: 3, votes: 2 },
+        { cardValue: 5, votes: 3 },
+        { cardValue: 8, votes: 1 },
+
+      ];
+
+      const resultsContainer = document.querySelector('.results-container');
+      const medianResult = document.querySelector('.median-result');
+
+      // Function to generate the result HTML
+      function generateResultHTML(data) {
+        return data.map((result) => {
+          return `
+              <div class="result">
+                <span class="card-value">${result.cardValue}</span>
+                <span class="votes-count">${result.votes} voto${result.votes > 1 ? 's' : ''}</span>
+              </div>
+            `;
+        }).join('');
+      }
+
+      // Generate the results HTML
+      const resultsHTML = generateResultHTML(jsonData);
+      resultsContainer.innerHTML = resultsHTML;
+
+
+      //=============================================
+      const cards = document.querySelectorAll('.card');
+
+      let selectedCard = null;
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          if (selectedCard) {
+            selectedCard.classList.remove('selected');
+          }
+          card.classList.add('selected');
+          selectedCard = card;
+        });
+      });
+
+
+
+      const playersContainer = document.querySelector('.players');
+      const playersData = [
+        { name: 'John Doe', value: '10' },
+        { name: 'Jane Doe', value: '20' },
+        { name: 'Bob Smith', value: '30' },
+        { name: 'Alice Johnson', value: '40' },
+
+
+
+        // Add more players here...
+      ];
+
+      playersData.forEach((player) => {
+        const playerHTML = `
+                <div class="player">
+                <div class="name">${player.name}</div>
+                <div class="card">
+                    <div class="value">${player.value}</div>
+                    
+                </div>
+                </div>
+            `;
+        playersContainer.insertAdjacentHTML('beforeend', playerHTML);
+      });
+
+      const cardsContainer = document.querySelector('.cards');
+      const cardsData = [
+        { value: '0' },
+
+        { value: '1' },
+        { value: '2' },
+        { value: '3' },
+        { value: '5' },
+        { value: '8' },
+        { value: '13' },
+        { value: '?' },
+      ]
+      cardsData.forEach((card) => {
+        const cardHTML = `
+                <div class="card">
+                    <div class="value">${card.value}</div>
+                   
+                </div>
+            `;
+        cardsContainer.insertAdjacentHTML('beforeend', cardHTML);
+      });
+      // assume this is the JSON object
+      const historyData = [
+        { title: 'Rebimboca da parafuseta do braço esquerdo para o braço direito e vice-versa', result: '80' },
+        { title: 'Fix a altura da largura', result: '90' },
+        { title: 'Ver p que podemos', result: '100' },
+        { title: 'Rebimboca da parafuseta do braço esquerdo para o braço direito e vice-versa', result: '80' },
+        { title: 'Fix a altura da largura', result: '90' },
+        { title: 'Ver p que podemos', result: '100' },
+        { title: 'Rebimboca da parafuseta do braço esquerdo para o braço direito e vice-versa', result: '80' },
+        { title: 'Fix a altura da largura', result: '90' },
+      ];
+
+      // get the ul element
+      const ul = document.getElementById("vote-list");
+
+      // loop through the JSON data and create li elements
+      historyData.forEach((item) => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-item');
+
+        const title = document.createElement('h4');
+        title.textContent = item.title;
+
+        const result = document.createElement('p');
+        result.textContent = `Resultado: ${item.result}`;
+
+        listItem.appendChild(title);
+        listItem.appendChild(result);
+
+        ul.appendChild(listItem);
+      });
+    </script>
+</body>
+
+</html>

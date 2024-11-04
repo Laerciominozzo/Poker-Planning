@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planning Poker</title>
+  <style>
+    body {
+      font-family: "Lato", -apple-system, Helvetica, Arial, sans-serif;
+      text-align: center;
+    }
+
+    button {
+      all: unset;
+      cursor: pointer;
+    }
+
+    .card {
+      width: 49px;
+      height: 70px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin: 10px;
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .card .value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .card .description {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .selected {
+      background-color: #aab7bd;
+    }
+
+
+    .player {
+      display: inline-block;
+      vertical-align: top;
+      margin: 20px;
+
+    }
+
+    .player .name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .player .card {
+      margin: 0;
+      background-color: aliceblue;
+    }
+
+    .players {
+      border: black 1px solid;
+      border-radius: 20px;
+      padding: 10px;
+      background-color: #9cb899;
+      width: fit-content;
+      margin: auto;
+      min-width: 350px;
+
+
+    }
+
+    .deck {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: aliceblue;
+    }
+
+    .task {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    .buttons {
+      margin-left: 20px;
+      margin-bottom: 10px;
+    }
+
+    .task-title {
+      margin-top: 0;
+      margin-bottom: 10px;
+
+    }
+
+    .reveal-button,
+    .new-button {
+      background-color: #4CAF50;
+      /* green */
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+
+    .cancel-button {
+      background-color: #ccc;
+      /* gray */
+      color: #333;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+      border-radius: 10px;
+    }
+
+
+    .poker-planning-table {
+      flex: 80%;
+    }
+
+    .main-title {
+
+      margin-bottom: 0px;
+    }
+
+    .poker-planning-table,
+    .vote-list {
+
+      background-color: #f7f7f7;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    .results-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 10px;
+      padding: 10px;
+
+    }
+
+
+    .card-value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .card-description {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .votes-count {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .median-result {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .scroll {
+      height: 100vh;
+      padding-bottom: 95px;
+    }
+
+    .median-result h3 {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .median-result p {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .maincontent {
+      margin-bottom: 100px;
+      display: flex;
+      /* make the container a grid container */
+    }
+
+    .list-item {
+      margin-bottom: 20px;
+    }
+
+    .list-item h4,
+    .list-item h5 {
+      margin: 0;
+    }
+
+    .list-item p {
+      margin: 0;
+    }
+
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    /* Style the popup container */
+    .popup {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+    }
+
+    /* Style the popup content */
+    .popup-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Style the form */
+    #task-form {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 400px;
+    }
+
+    #task-form label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    #task-form input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .task-button {
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #task-form button[type="submit"]:hover {
+      background-color: #3e8e41;
+    }
+
+    #error-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #ffe6e6;
+      /* soft red color */
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #error-message p {
+      color: #ff6666;
+      /* darker red color */
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1 class="main-title">{{ table_label }}</h1>
+    {{# isAdmin }}
+    <p> {{{ table_link }}}</p>
+    {{/ isAdmin }}
+
+  </header>
+  <div id="error-message" style="display: none;">
+    <p id=" error-message-text"></p>
+  </div>
+  <div class="scroll">
+
+    <div class="task">
+
+      <h2 id="task-title" class="task-title"></h2>
+      {{# isAdmin }}
+      <div id="voting-buttons" class="buttons">
+        <button class="reveal-button" onclick="RevealRequest()">Revelar</button>
+        <button class="cancel-button" onclick="CancelRequest()">Cancelar</button>
+      </div>
+      <div id="new-task-button" class="buttons" style="display: none;">
+        <button id="open-popup" class="reveal-button">Nova Tarefa</button>
+        <!-- <button id="close_room" class="reveal-button" onclick="CloseRoom()">Fechar Sala</a> -->
+      </div>
+      {{/ isAdmin }}
+    </div>
+    <div class="maincontent">
+
+      <div class="poker-planning-table">
+        <div class="players">
+          <!--Players-->
+        </div>
+
+        <div class="results-container">
+          <div>
+            <h2 id="median-result"></h2>
+            <table id="results-table">
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="vote-list">
+        <h2>Tarefas votadas</h2>
+        <ul id="vote-list" class="list">
+          <!-- Add more tasks here -->
+        </ul>
+      </div>
+
+    </div>
+
+    <footer class="deck">
+
+      <div class="cards">
+
+      </div>
+
+    </footer>
+
+    {{# isAdmin }}
+    <!-- Popup container -->
+    <div id="popup" class="popup">
+      <!-- Popup content -->
+      <div class="popup-content">
+        <h2>Criar nova tarefa</h2>
+        <form id="task-form" method="POST" action="{{{ new_task_link }}}">
+          <label for="description">Descrição:</label>
+          <input type="text" id="task_name" name="task_name"></input>
+          <button id="submit-task" class="task-button">Criar Tarefa</button>
+        </form>
+      </div>
+    </div>
+    {{/ isAdmin }}
+    <script>
+
+      function showError(message) {
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.style.display = 'block';
+        errorMessage.innerHTML = `<p>${message}</p>`;
+        setTimeout(() => {
+          errorMessage.style.display = 'none';
+        }, 5000); // 5 seconds
+      }
+
+      function callFunctionEverySecond(func) {
+        setInterval(func, 3000);
+      }
+
+      //=============================================
+      // Function to fetch the data
+      callFunctionEverySecond(fetchData);
+      fetchData();
+      async function fetchData() {
+        const url = "{{{ status_link }}}";
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            showError(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+
+          // === Resultado ===
+          if (data.result) {
+            generateResultHTML(data.result);
+          }
+
+          // === Players ===
+          if (data.players) {
+            generatePlayersHTML(data.players);
+          }
+
+          // === Cards ===
+          if (data.deck) {
+            generateCardsHTML(data.deck);
+          }
+
+          // === Vote List ===
+          if (data.tasks) {
+            generateVoteListHTML(data.tasks);
+          }
+
+          // === Task Title ===
+          if (data.task) {
+            generateTaskTitleHTML(data.task);
+          }
+
+          // === Task State ===
+          if (data.state) {
+            presentButtons(data.state);
+          }
+
+          // ==== Show Card ====
+          if (data.card) {
+            showCard(data.card);
+          }
+
+          // ==== Show Result ====
+          if (data.task.result) {
+            showResult(data.task.result);
+          } else {
+            hideResult();
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+
+      //=============================================
+      // Show result
+      function showResult(result) {
+        const results_container = document.querySelector('.results-container');
+        results_container.style.display = 'block';
+
+        const median_result = document.querySelector('#median-result');
+        const most_voted_result = document.querySelector('#most-voted-result');
+        median_result.textContent = `Media: ${result.median}`;
+
+
+        const result_table = document.querySelector('#results-table');
+        result_table.innerHTML = '';
+        table_header = document.createElement('tr');
+        table_header.innerHTML = `
+        <th>Carta</th>
+        <th>Número votos</th>
+        `;
+        result_table.appendChild(table_header);
+        result_table
+        result.votes.forEach((item) => {
+          const table_row = document.createElement('tr');
+          table_row.innerHTML = `
+          <td>${item.card}</td>
+          <td>${item.votes}</td>
+          `;
+          result_table.appendChild(table_row);
+        });
+      }
+      function hideResult() {
+        const results_container = document.querySelector('.results-container');
+        results_container.style.display = 'none';
+      }
+      //=============================================
+      // Function to show the card
+      function showCard(card) {
+        const cardElement = document.getElementById('card-' + card.label);
+        // use class sselected
+        cardElement.classList.add('selected');
+      }
+
+      //=============================================
+      // Function to present the buttons
+      function presentButtons(state) {
+        const votingButtons = document.getElementById('voting-buttons');
+        if (votingButtons == null) {
+          return
+        }
+        const newTaskButton = document.getElementById('new-task-button');
+
+        const new_button_states = ["NO_DEFINED", "TASK_FINISHED"]
+        if (new_button_states.includes(state)) {
+          votingButtons.style.display = 'none';
+          newTaskButton.style.display = 'block';
+        } else {
+          votingButtons.style.display = 'block';
+          newTaskButton.style.display = 'none';
+        }
+      }
+
+      //=============================================
+      // Function to generate the task title
+      function generateTaskTitleHTML(data) {
+        const taskTitle = document.getElementById('task-title');
+        taskTitle.textContent = data.label;
+      }
+
+
+      //=============================================
+      // Function to generate the players HTML
+      function generatePlayersHTML(data) {
+        const playersContainer = document.querySelector('.players');
+        const playersHTML = data.map((player) => {
+          return `
+                <div class="player">
+                  <div class="name">${player.name}</div>
+                  
+                  <div class="card">
+                      <div class="value">${player.card}</div>
+                  </div>
+                  {{# isAdmin }}
+                    <button class="trash-button" title="Remover usuário" onclick="removePlayer('${player.id}')">
+                      &#128465;
+                    </button>
+                  {{/ isAdmin }}
+                </div>
+            `;
+        }).join('');
+        playersContainer.innerHTML = playersHTML;
+      }
+
+      //=============================================
+      // Function to generate the cards deck HTML 
+      function generateCardsHTML(data) {
+        const cardsContainer = document.querySelector('.cards');
+        const cardsHTML = data.map((card) => {
+          return `
+                <div id= "card-${card.label}" class="card">
+                    <button class="value" onclick="selectCard('${card.label}')"">${card.label}</button>
+                </div>
+            `;
+        }).join('');
+        cardsContainer.innerHTML = cardsHTML;
+      }
+      //=============================================
+      // Function to generate the vote list HTML
+      function generateVoteListHTML(data) {
+        const ul = document.getElementById("vote-list");
+        ul.innerHTML = ''; // clear existing list items
+
+        data.forEach((item) => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('list-item');
+
+          const title = document.createElement('h4');
+          title.textContent = item.label;
+
+          const result = document.createElement('h5');
+          const votes = document.createElement('p');
+          if (item.result) {
+            result.textContent = `Media ${item.result.median}`;
+
+            if (item.result.votes) {
+              item.result.votes.forEach((vote) => {
+                votes.textContent += `${vote.card}(${vote.votes} voto${vote.votes > 1 ? 's' : ''}), `;
+              })
+            }
+
+          }
+
+          listItem.appendChild(title);
+          listItem.appendChild(result);
+          listItem.appendChild(votes);
+
+          ul.appendChild(listItem);
+        });
+      }
+
+      //=============================================
+      // Function to select the card
+      async function selectCard(card) {
+        const url = "{{{ vote_link }}}";
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vote: card })
+          });
+          if (!response.ok) {
+            const text = await response.text();
+            showError(text);
+            throw new Error(`HTTP error! status: ${response.status}`);
+          } else {
+            fetchData();
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+
+      //=============================================
+      // Popup
+      // Get the popup container and the button to open it
+      const popup = document.getElementById('popup');
+      const openPopupButton = document.getElementById('open-popup');
+
+      // Add an event listener to the button to open the popup
+      openPopupButton.addEventListener('click', () => {
+        popup.style.display = 'block';
+      });
+
+      // Add an event listener to the popup container to close it when clicked outside
+      popup.addEventListener('click', (e) => {
+        if (e.target === popup) {
+          popup.style.display = 'none';
+        }
+      });
+
+      // Get the form and add an event listener to submit it
+      const taskForm = document.getElementById('task-form');
+      /*taskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const description_element = document.getElementById('description');
+        const description = description_element.value;
+        // post the description to the server
+        fetch(taskForm.action, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ description })
+        }).then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          description_element.value = '';
+        })
+        // Close the popup
+        popup.style.display = 'none';
+      });*/
+
+      function RevealRequest() {
+        fetch('{{{ reveal_link}}}')
+          .then(response => {
+            if (response.ok) {
+              // Response is OK, execute other function
+              fetchData();
+            } else {
+              // Response is not OK, handle error
+              response.text().then(text => {
+                showError(text);
+              });
+              console.error('Error:', response.status);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      }
+
+      function CancelRequest() {
+        fetch('{{{ cancel_link}}}')
+          .then(response => {
+            if (response.ok) {
+              // Response is OK, execute other function
+              fetchData();
+            } else {
+              // Response is not OK, handle error
+              response.text().then(text => {
+                showError(text);
+              });
+              console.error('Error:', response.status);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      }
+
+      function removePlayer(id) {
+        fetch('{{{ remove_link }}}', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id })
+        })
+          .then(response => {
+            if (response.ok) {
+              // Response is OK, execute other function
+              fetchData();
+            } else {
+              // Response is not OK, handle error
+              response.text().then(text => {
+                showError(text);
+              });
+              console.error('Error:', response.status);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      }
+    </script>
+</body>
+
+</html>
