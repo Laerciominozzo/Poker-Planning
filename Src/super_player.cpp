@@ -64,7 +64,9 @@ void SuperPlayer::removePlayer(Table *table, std::string player_id)
     {
         if (**it == player_id)
         {
+            delete *it;
             table->players.erase(it);
+
             break;
         }
     }
