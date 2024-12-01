@@ -39,4 +39,6 @@ RUN apt install rsyslog -y
 # Clean up
 RUN rm -rf /app/Crow
 
+RUN apt-get install libcurl4-openssl-dev -y
+
 CMD ["rsyslog", "-n"]

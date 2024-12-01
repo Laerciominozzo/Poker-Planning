@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <curl/curl.h>
 
 /**
  * Generates a SHA256 hash of the given seed and identifier,
@@ -61,7 +62,23 @@ void replaceAll(std::string &str, const std::string &oldChar, const std::string 
         pos = str.find(oldChar, pos + 1);
     }
 }
-
+std::string decodeURL(std::string &str)
+{
+    std::string ret;
+    CURL *curl = curl_easy_init();
+    if (curl)
+    {
+        int decodelen;
+        char *decoded = curl_easy_unescape(curl, str.c_str(), str.length(), &decodelen);
+        if (decoded)
+        {
+            ret = std::string(decoded, decodelen);
+            curl_free(decoded);
+        }
+        curl_easy_cleanup(curl);
+    }
+    return ret;
+}
 int decodeBody(std::string body, std::map<std::string, std::string> &form_data)
 {
 
@@ -77,7 +94,7 @@ int decodeBody(std::string body, std::map<std::string, std::string> &form_data)
         {
             auto key = pair.substr(0, equal_pos);
             auto value = pair.substr(equal_pos + 1);
-            form_data[key] = value;
+            form_data[key] = decodeURL(value);
         }
         body.erase(0, pos + 1);
     }
@@ -88,7 +105,8 @@ int decodeBody(std::string body, std::map<std::string, std::string> &form_data)
     {
         auto key = body.substr(0, equal_pos);
         auto value = body.substr(equal_pos + 1);
-        form_data[key] = value;
+
+        form_data[key] = decodeURL(value);
     }
     return 0;
 }
