@@ -1,5 +1,6 @@
 #include "result.hpp"
 
+#include <cmath>
 void Result::addVote(const Card &card)
 {
     votes[card]++;
@@ -10,18 +11,22 @@ int Result::getMedian() const
     float median = 0;
     int votes = 0;
 
-    if (this->votes.size() == 0)
+    for (auto &v : this->votes)
+    {
+        if (v.first.value >= 0)
+        {
+            median += v.first.value * v.second;
+            votes += v.second;
+        }
+    }
+
+    if (votes == 0)
     {
         return 0;
     }
 
-    for (auto &v : this->votes)
-    {
-        median += v.first.value * v.second;
-        votes += v.second;
-    }
-
     median /= votes;
+    median = round(median);
     return median;
 }
 

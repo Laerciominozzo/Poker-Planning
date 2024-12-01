@@ -38,7 +38,7 @@ const std::string Player::toJson(const bool &show_card) const
 {
     if (card == NULL)
     {
-        return "{\"id\":\"" + id + "\",\"name\":\"" + name + "\",\"card\":\"?\"}";
+        return "{\"id\":\"" + id + "\",\"name\":\"" + name + "\",\"card\":\"-\"}";
     }
 
     if (!show_card)
